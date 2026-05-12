@@ -1,0 +1,186 @@
+
+{% extends 'base.html' %}
+{% block content %}
+
+
+<style>
+        .mainHeader{
+
+            padding-top: 1px;
+            padding-bottom: 1px;
+            background-color: white !important;
+            border-bottom: 5px solid #0b6cb8;
+        }
+
+        .logo_icon{
+
+            height: 38px;
+        }
+
+        .liColor{
+            color: #4f4f4f
+
+        }
+
+        .toolbar {
+            border: 1px solid #ccc;
+        }
+        .text {
+            border: 1px solid #ccc;
+            min-height: 300px;
+
+        }
+<!--        //////-->
+img {
+	width: 100%;
+	display: block;
+	border: none;
+	vertical-align: bottom;
+	border: none;
+}
+
+.Box1 {
+   background-color: #FEFEFF;
+    color: #333333;
+    font-size: 18px;
+    border: 2px solid #088DEA;
+    margin-top: 5%;
+    margin-left: 5%;
+    width: 90%;
+}
+.Box {
+    height: 40px;
+    margin-left: 6%;
+    line-height: 65px;
+    font-size: 18px;
+    font-family: FangSong;
+    font-weight: bold;
+}
+.productImg {
+height: 530px;
+overflow: hidden;
+}
+.imgBiMG{
+    width: 20%;
+    height: 84px;
+    float: left;
+    display: block;
+    margin-left: 7%;
+    margin-top: 2%;
+}
+.uploadDIv {
+    width: 95px;
+    height: 75px;
+    background-color: #edf0f2;
+    font-size: 70px;
+    color: #bfbfbf;
+    text-align: center;
+    line-height: 75px;
+    float: left;
+    position: relative;
+    left: 7%;
+    top: 5%;
+}
+.uploadDIv input {
+	width: 78px;
+	height: 78px;
+	opacity: 0;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	z-index: 4;
+	padding: 0;
+}
+
+.setPops{width: 70%;
+    position: absolute;
+    left:15%;
+    top:50%;
+    z-index: 10;
+    overflow: hidden;
+    display: none;
+}
+.filterPop{
+    background: rgba(0,0,0,.5);
+    position: absolute;
+    left:0px;
+    top:0px;
+    width: 100%;
+    height:100%;
+    z-index: 9;
+    overflow: hidden;
+    display: none;
+}
+
+
+    /*错误提示*/
+.error-tip{
+    float:right;
+    height:20px;
+    line-height:20px;
+    text-align:left;
+    font-size:12px;
+    width:100%; color:red;
+<!--    display:none;-->
+    position:absolute;
+    right:0px;
+   }
+
+</style>
+
+
+
+
+ <div class="card border-0 shadow-sm">
+            <div class="card-body py-4">
+                <form enctype="multipart/form-data"  v-on:submit.prevent="uploadFile" id="form">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">文章标题</label>
+                        <input type="title" v-model="title" @blur="check_title" class="form-control" id="title" name="title">
+                        <span class="error-tip" v-show="error_title">  ${error_title_msg}  </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">文章内容</label>
+                        <div style="padding: 8px 0; color: #ccc"></div>
+                            <div id="div1" class="toolbar">
+                        </div>
+                        <div id="div2" class="text" contenteditable="true" v-model="content" @blur="check_content" @input="content=$event.target.innerHTML"></div> <!--可使用 min-height 实现编辑区域自动增加高度-->
+                        <span class="error-tip" v-show="error_content">  ${error_content_msg}  </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">附加图片(文章封面)</label>
+                        <input type="file" ref="fileInput" name="files" class="form-control" id="file" autocomplete="off" >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" >提交文章</button>
+                    <span class="error-tip" v-show="error_form">  ${error_form_msg}  </span>
+                </form>
+            </div>
+
+        </div>
+
+<script type="text/javascript" src="{{static('js/pieces/article.js')}}"></script>
+<!--<script type="application/javascript">-->
+<!--        function upload(){-->
+<!--            var title = document.getElementById("title").value;-->
+<!--            var content = document.getElementById("div2").textContent;-->
+<!--            console.log('title-&ndash;&gt;',title);-->
+<!--            console.log('content-&ndash;&gt;',content);-->
+<!--            var formData = new FormData();-->
+<!--			        for(var i=0;i<$("#file")[0].files.length;i++) {  //循环获取上传个文件-->
+<!--			            formData.append("file", $("#file")[0].files[i]);-->
+<!--			        }-->
+<!--            formData.append('title',title);-->
+<!--            formData.append('content',content);-->
+<!--			console.log('formData-&ndash;&gt;',formData)-->
+<!--			axios.post('/pieces/publish_article/',formData).then(response=>{-->
+<!--			        if(response.data.code==200){-->
+<!--			            swal('文章发布成功');-->
+<!--			        }else{-->
+<!--			            swal('文章发布失败');-->
+<!--			        }-->
+<!--			});-->
+<!--        }-->
+<!--</script>-->
+{% endblock content %}

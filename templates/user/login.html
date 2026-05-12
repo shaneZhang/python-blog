@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>qloves Blog</title>
+    <link rel="icon" href="/static/images/q3.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/static/images/q3.png" sizes="16x16" type="image/png">
+    <script src="/static/js/vue.js"></script>
+    <script type="text/javascript" src="{{ static('js/axios-0.18.0.min.js') }}"></script>
+    <script>
+        function transform(){
+            window.location.href = '/user/transform/?type=login';
+        }
+    </script>
+
+
+</head>
+<style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #EAF6F7;
+}
+
+h2 {
+    margin-bottom: 10px;
+    font-size: 32px;
+    text-transform: capitalize;
+}
+
+.container {
+    position: relative;
+    width: 768px;
+    height: 480px;
+    background-color: white;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: white;
+    transition: all 0.6s ease-in-out;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    height: 100%;
+    width: 100%;
+    padding: 0 50px;
+}
+.form_ {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    width: 100%;
+
+}
+
+input {
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px;
+    background-color: #eee;
+    border: none;
+}
+.mxh-item{
+    width: 100%;
+    margin: 6px 0;
+    left:0px;
+    padding: 1px;
+<!--    background-color: #eee;-->
+    border: none;
+}
+
+.forget-password {
+    display: inline-block;
+    height: 20px;
+    text-decoration: none;
+    color: #bbb;
+    text-transform: capitalize;
+    font-size: 12px;
+    padding: 8px 80px;
+}
+
+.forget-password:hover {
+    color: lightslategray;
+    border-bottom: 2px solid #ff4b2b;
+}
+
+button {
+    background: #ff4b2b;
+    padding: 10px 50px;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    text-transform: uppercase;
+    color: white;
+    margin-top: 10px;
+    outline: none;
+    transition: transform 80;
+}
+
+
+button:active {
+    transform: scale(0.95);
+}
+
+.overlay_container {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 100;
+    right: 0;
+    overflow: hidden;
+    transition: all 0.6s ease-in-out;
+}
+.social-account{
+    position: absolute;
+    top: 100;
+    margin-top: 310px;
+
+    overflow: hidden;
+
+}
+
+.overlay {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    left: -100%;
+    background-color: #ff4b2b;
+}
+
+.overlay_panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: 100%;
+    color: white;
+    padding: 0 40px;
+    text-align: center;
+}
+
+.overlay_panel button {
+    background-color: transparent;
+    border: 1px solid white;
+}
+
+.overlay_panel p {
+    font-size: 12px;
+    margin: 10px 0 15px 0;
+}
+
+.overlay_right_container {
+    right: 0;
+}
+
+.container.active .sign-up-container {
+    transform: translateX(100%);
+    z-index: 5;
+}
+
+.container.active .sign-in-container {
+    transform: translateX(100%);
+}
+
+.container.active .overlay_container {
+    transform: translateX(-100%);
+}
+
+.container.active .overlay {
+    transform: translateX(50%);
+}
+/*错误提示*/
+.error-tip{
+    float:right;
+    height:20px;
+    line-height:20px;
+    text-align:left;
+    font-size:12px;
+    width:100%; color:red;
+<!--    display:none;-->
+    position:absolute;
+    right:0px;
+   }
+</style>
+<body>
+    <!-- login/register container -->
+
+    <div class="container">
+
+        <div class="form-container sign-in-container">
+            <form class="form" id="form" action="/user/login/" method="post" @submit="reg_sub">
+                <h2 class="form_">sign in</h2>
+                <p class="form-row form-row-wide">
+                    <input type="text" v-model="username" name="username" id="username" @blur="check_uname" placeholder="Username...">
+                    <span class="error-tip" v-show="error_username">${error_username_msg}</span>
+                </p>
+                <p class="form-row form-row-wide">
+                    <input type="password" v-model="password" name="password" id="password" @blur="check_pwd" placeholder="Password...">
+                    <span class="error-tip" v-show="error_password">${error_password_msg}</span>
+                </p>
+                <a href="#" class="forget-password">forget your password</a>
+                <button class="signIn" type="submit">sign in</button>
+
+                <!--                第三方登录-->
+                <div class="social-account">
+                                <h5 class="title-social">社交帐号登录</h5>
+                                <a :href="qq_url" class="mxh-item">
+                                    <svg class="Zi Zi--QQ Login-socialIcon" fill="#50c8fd" viewBox="0 0 24 24" width="20" height="20"><path d="M12.003 2c-2.265 0-6.29 1.364-6.29 7.325v1.195S3.55 14.96 3.55 17.474c0 .665.17 1.025.281 1.025.114 0 .902-.484 1.748-2.072 0 0-.18 2.197 1.904 3.967 0 0-1.77.495-1.77 1.182 0 .686 4.078.43 6.29 0 2.239.425 6.287.687 6.287 0 0-.688-1.768-1.182-1.768-1.182 2.085-1.77 1.905-3.967 1.905-3.967.845 1.588 1.634 2.072 1.746 2.072.111 0 .283-.36.283-1.025 0-2.514-2.166-6.954-2.166-6.954V9.325C18.29 3.364 14.268 2 12.003 2z" fill-rule="evenodd"></path></svg>
+
+                                    <span class="text"> QQ</span>
+                                </a>
+                                <a :href="wechat_url" class="mxh-item">
+                                    <svg class="Zi Zi--WeChat Login-socialIcon" fill="#60c84d" viewBox="0 0 24 24" width="20" height="20"><path d="M2.224 21.667s4.24-1.825 4.788-2.056C15.029 23.141 22 17.714 22 11.898 22 6.984 17.523 3 12 3S2 6.984 2 11.898c0 1.86.64 3.585 1.737 5.013-.274.833-1.513 4.756-1.513 4.756zm5.943-9.707c.69 0 1.25-.569 1.25-1.271a1.26 1.26 0 0 0-1.25-1.271c-.69 0-1.25.569-1.25 1.27 0 .703.56 1.272 1.25 1.272zm7.583 0c.69 0 1.25-.569 1.25-1.271a1.26 1.26 0 0 0-1.25-1.271c-.69 0-1.25.569-1.25 1.27 0 .703.56 1.272 1.25 1.272z" fill-rule="evenodd"></path></svg>
+
+                                    <span class="text">微信</span>
+                                </a>
+                </div>
+            </form>
+        </div>
+        <!-- overlay container -->
+        <div class="overlay_container">
+            <div class="overlay">
+                <!-- overlay left -->
+<!--                <div class="overlay_panel overlay_left_container">-->
+<!--                    <h2>welcome back!</h2>-->
+<!--                    <p>To keep connected with us please login with your personal info</p>-->
+<!--                    <button id="sign-in">sign in</button>-->
+<!--                </div>-->
+                <!-- overlay right sign up -->
+                <div class="overlay_panel overlay_right_container">
+                    <h2>hello friend!</h2>
+                    <p>Enter your username and password and start your journey</p>
+                    <button id="sign-up" onclick="transform()">sign up</button>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="{{ static('js/user/login.js') }}"></script>
+
+</body>
+
+</html>

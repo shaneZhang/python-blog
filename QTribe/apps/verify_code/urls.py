@@ -1,0 +1,11 @@
+from django.urls import re_path, path
+
+from verify_code.views import SendSmsCode,CheckSmsCode
+
+
+
+urlpatterns=[
+    re_path(r'send_smscode/(?P<phone>1[3,5,7,8,9]\d{9})/',SendSmsCode.as_view()),
+    re_path(r'check_smscode/(?P<phone>1[3,5,7,8,9]\d{9})/',CheckSmsCode.as_view()),
+
+]
