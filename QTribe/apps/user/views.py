@@ -22,13 +22,32 @@ from QTribe.tasks import send_message
 class Register(View):
 
     def get(self,request):
+        # 检查是否是邮箱注册
+        register_type = request.GET.get('type', 'phone')
+        if register_type == 'email':
+            return render(request, 'user/email_register.html')
         return render(request,'user/register.html')
+
     def post(self,request):
         state={'code':-1}
         username=request.POST.get('username')
         password=request.POST.get('password')
         phone=request.POST.get('phone')
-        user=UserModel.objects.create_user(username=username,password=password,phone=phone)
+        email=request.POST.get('email')
+
+        # 根据是否有email参数判断是邮箱注册还是手机注册
+        if email:
+            # 邮箱注册
+            user=UserModel.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                phone=''  # 手机为空，因为UserModel中phone是必填字段但无实际意义
+            )
+        else:
+            # 手机注册
+            user=UserModel.objects.create_user(username=username,password=password,phone=phone)
+
         if user:
             state={'code':200}
             auth.login(request,user)

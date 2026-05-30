@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>qloves Blog</title>
+    <title>qloves Blog - 邮箱注册</title>
     <link rel="icon" href="/static/images/q3.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/static/images/q3.png" sizes="16x16" type="image/png">
     <script src="/static/js/vue.js"></script>
@@ -28,11 +28,7 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #EAF6F7;
-<!--linear-gradient(to right, red 0%,red 50%,white 51%,white 100%);-->
-<!--   background: url('/static/images/login-bg-6.jpg') no-repeat;-->
-<!--#f6f5f7;-->
     background-size: 100% 130%;
-
 }
 
 h2 {
@@ -87,7 +83,7 @@ input {
     background-color: #eee;
     border: none;
 }
-#smscode{
+#emailcode{
     width: 160px;
     margin: 8px 2px;
     padding: 12px 12px;
@@ -207,54 +203,61 @@ button:active {
     text-align:left;
     font-size:12px;
     width:100%; color:red;
-<!--    display:none;-->
     position:absolute;
     right:0px;
    }
+
+/* 切换注册方式链接 */
+.switch-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+.switch-link a {
+    color: #ff4b2b;
+    text-decoration: none;
+}
+.switch-link a:hover {
+    text-decoration: underline;
+}
 </style>
 <body>
     <!-- login/register container -->
     <div class="container">
-<!--         register-->
+        <!-- 邮箱注册 -->
         <div class="form-container sign-up-container">
 
             <form class="form" id="form" method="post" action="/user/register/" @submit="reg_sub">
-                <h2 class="form_">sign up</h2>
+                <h2 class="form_">邮箱注册</h2>
                 <p class="form-row form-row-wide">
                     <input type="text" v-model="username" @blur="check_uname" name="username" id="username" placeholder="Username...">
                     <span class="error-tip" v-show="error_username">  ${error_username_msg}  </span>
                 </p>
                 <p class="form-row form-row-wide">
-                    <input type="text" v-model="phone" @blur="check_phone" name="phone" id="phone" placeholder="Phone...">
-                     <span class="error-tip" v-show="error_phone">  ${error_phone_msg}  </span>
-                <p class="form-row form-row-wide">
-                    <input   type="text" v-model="smscode" @blur="check_smscode" name="smscode" placeholder="Verify code"   class="input-text" id="smscode" >
-                    <span class="error-tip" v-show="error_smscode">  ${error_smscode_msg}  </span> <a href="javascript:;" style="font-size: 16px;text-ali、gn: center;font-weight: normal;float: right;"  id="get_code" @click="send_smscode" >${smscode_btn}</a>
+                    <input type="email" v-model="email" @blur="check_email" name="email" id="email" placeholder="Email...">
+                    <span class="error-tip" v-show="error_email">  ${error_email_msg}  </span>
                 </p>
-<!--                <button style="font-size: 16px;text-align: center;font-weight: normal;float: right;" id="get_code" @click="send_smscode">${smscode_btn}</button>-->
+                <p class="form-row form-row-wide">
+                    <input type="text" v-model="emailcode" @blur="check_emailcode" name="emailcode" placeholder="邮箱验证码" class="input-text" id="emailcode">
+                    <span class="error-tip" v-show="error_emailcode">  ${error_emailcode_msg}  </span>
+                    <a href="javascript:;" style="font-size: 14px;text-align: center;font-weight: normal;float: right;" id="get_code" @click="send_emailcode">${emailcode_btn}</a>
+                </p>
 
                 <p class="form-row form-row-wide">
                     <input type="password" v-model="password" @blur="check_pwd" name="password" id="password" placeholder="Password...">
-                     <span class="error-tip" v-show="error_password">  ${error_password_msg}  </span>
+                    <span class="error-tip" v-show="error_password">  ${error_password_msg}  </span>
                 </p>
 
                 <button class="signUp" type="submit">sign up</button>
 
-                <p class="switch-link" style="text-align: center; margin-top: 15px; font-size: 14px;">
-                    <a href="/user/register/?type=email" style="color: #ff4b2b; text-decoration: none;">使用邮箱注册</a>
+                <p class="switch-link">
+                    <a href="/user/register/">使用手机号注册</a>
                 </p>
-
             </form>
         </div>
 
         <div class="overlay_container">
             <div class="overlay">
-                <!-- overlay left -->
-<!--                <div class="overlay_panel overlay_left_container">-->
-<!--                    <h2>welcome back!</h2>-->
-<!--                    <p>To keep connected with us please login with your personal info</p>-->
-<!--                    <button id="sign-in">sign in</button>-->
-<!--                </div>-->
                 <div class="overlay_panel overlay_right_container">
                     <h2>hello friend!</h2>
                     <p>Enter your personal details and start journey with us</p>
@@ -264,30 +267,9 @@ button:active {
         </div>
     </div>
     <script src="/static/js/axios-0.18.0.min.js"></script>
-	<script src="/static/js/jquery-1.12.4.min.js"></script>
-	<script src="/static/js/jquery.plugin-countdown.min.js"></script>
-	<script src="/static/js/jquery-countdown.min.js"></script>
-	<script src="/static/js/bootstrap.min.js"></script>
-	<script src="/static/js/owl.carousel.min.js"></script>
-	<script src="/static/js/magnific-popup.min.js"></script>
-	<script src="/static/js/isotope.min.js"></script>
-	<script src="/static/js/jquery.scrollbar.min.js"></script>
-	<script src="/static/js/jquery-ui.min.js"></script>
-	<script src="/static/js/mobile-menu.js"></script>
-	<script src="/static/js/chosen.min.js"></script>
-	<script src="/static/js/slick.js"></script>
-	<script src="/static/js/jquery.elevateZoom.min.js"></script>
-	<script src="/static/js/jquery.actual.min.js"></script>
-	<script src="/static/js/fancybox/source/jquery.fancybox.js"></script>
-	<script src="/static/js/lightbox.min.js"></script>
-	<script src="/static/js/owl.thumbs.min.js"></script>
-	<script src="/static/js/jquery.scrollbar.min.js"></script>
-	<script src="/static/js/frontend-plugin.js"></script>
-<!--	<script src="/static/js/user/register.js"></script>-->
-<script type="text/javascript" src="{{static('js/user/register.js')}}"></script>
-
+    <script src="/static/js/jquery-1.12.4.min.js"></script>
+    <script src="/static/js/user/email_register.js"></script>
 
 </body>
 
 </html>
-

@@ -7,7 +7,7 @@ from QTribe.utils.base_model import BaseModel2
 
 class UserModel(AbstractUser,BaseModel2):
 
-    phone=models.CharField(verbose_name='电话号码',max_length=11,unique=True)
+    phone=models.CharField(verbose_name='电话号码',max_length=11,unique=True, blank=True, null=True)
     icon=models.ImageField(verbose_name='用户头像',blank=True,null=True)
     personalized_signature=models.CharField(verbose_name='个性签名',max_length=256,blank=True,null=True)
     personal_introduce=models.CharField(verbose_name='个人介绍',max_length=1024,blank=True,null=True)
