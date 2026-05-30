@@ -1,5 +1,6 @@
 import json
 
+import django_redis
 from django.contrib import auth
 from django.contrib.admin import action
 from django.db import transaction
@@ -18,6 +19,9 @@ from pieces_info.models import ImageModel,Message
 
 from QTribe.tasks import send_message
 
+# 固定的邮箱验证码（用于测试）
+FIXED_EMAIL_CODE = "123456"
+
 
 class Register(View):
 
@@ -33,6 +37,53 @@ class Register(View):
             state={'code':200}
             auth.login(request,user)
         return redirect('/index/home_index/')
+
+
+class EmailRegister(View):
+    """邮箱注册视图"""
+
+    def get(self, request):
+        return render(request, 'user/email_register.html')
+
+    def post(self, request):
+        state = {'code': -1}
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        emailcode = request.POST.get('emailcode')
+
+        # 校验参数
+        if not all([username, password, email, emailcode]):
+            return JsonResponse({'code': 4001, 'errormsg': '缺少必传参数'})
+
+        # 校验邮箱验证码
+        redis_conn = django_redis.get_redis_connection('verify_code')
+        code_real = redis_conn.get(f'email_{email}')
+
+        if code_real is None:
+            return JsonResponse({'code': 4002, 'errormsg': '验证码已过期'})
+
+        code_real = code_real.decode('utf-8')
+
+        if code_real != emailcode:
+            return JsonResponse({'code': 4003, 'errormsg': '验证码错误'})
+
+        # 创建用户
+        try:
+            user = UserModel.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                phone=''  # 邮箱注册时手机号可以为空
+            )
+            if user:
+                state = {'code': 200}
+                auth.login(request, user)
+                return redirect('/index/home_index/')
+        except Exception as e:
+            return JsonResponse({'code': 500, 'errormsg': str(e)})
+
+        return redirect('/user/email_register/')
 #校验用户名
 class CheckUsername(View):
     def get(self,request,username):
