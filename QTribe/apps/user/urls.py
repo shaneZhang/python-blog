@@ -1,14 +1,13 @@
 from django.urls import path, re_path
 
-from user.views import Register, Login ,CheckUsername, CheckPhone,Transform,UpdateInformation,CheckEmail,ResetPassword,\
-                       CheckPassword,UploadImage,Logout,FocusUser,UserSearchView,MakeFriend,ResponseFriend,RefuseFriend,\
-                       ReadMessage
+from user.views import Register, Login, CheckUsername, CheckPhone, Transform, UpdateInformation, CheckEmail, ResetPassword, \
+    CheckPassword, UploadImage, Logout, FocusUser, UserSearchView, MakeFriend, ResponseFriend, RefuseFriend, \
+    ReadMessage, EmailRegister
 
-
-
-urlpatterns=[
-   path('register/',Register.as_view()),
-   path('login/',Login.as_view()),
+urlpatterns = [
+    path('register/', Register.as_view()),
+    path('email_register/', EmailRegister.as_view()),
+    path('login/', Login.as_view()),
    re_path('check_username/(?P<username>[A-Za-z][A-Za-z0-9]{2,7})/',CheckUsername.as_view()),
    re_path(r'check_phone/(?P<phone>1[3589]\d{9})/',CheckPhone.as_view()),
    re_path('check_password/',CheckPassword.as_view()),
