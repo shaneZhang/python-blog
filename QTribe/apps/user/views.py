@@ -1,5 +1,6 @@
 import json
 
+import django_redis
 from django.contrib import auth
 from django.contrib.admin import action
 from django.db import transaction
@@ -33,6 +34,114 @@ class Register(View):
             state={'code':200}
             auth.login(request,user)
         return redirect('/index/home_index/')
+
+
+class RegisterByEmail(View):
+    """通过邮箱注册用户"""
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
+            email = data.get('email')
+            email_code = data.get('email_code')
+
+            # 参数校验
+            if not all([username, password, email, email_code]):
+                return JsonResponse({'code': 4001, 'errormsg': '缺少必传参数'})
+
+            # 校验用户名是否已存在
+            if UserModel.objects.filter(username=username).exists():
+                return JsonResponse({'code': 4002, 'errormsg': '用户名已存在'})
+
+            # 校验邮箱是否已存在
+            if UserModel.objects.filter(email=email).exists():
+                return JsonResponse({'code': 4003, 'errormsg': '邮箱已被注册'})
+
+            # 校验邮箱验证码
+            redis_conn = django_redis.get_redis_connection('verify_code')
+            code_real = redis_conn.get(f'email_{email}')
+
+            if code_real is None:
+                return JsonResponse({'code': 4004, 'errormsg': '验证码已过期'})
+
+            if code_real.decode('utf-8') != email_code:
+                return JsonResponse({'code': 4005, 'errormsg': '验证码错误'})
+
+            # 创建用户
+            with transaction.atomic():
+                user = UserModel.objects.create_user(
+                    username=username,
+                    password=password,
+                    email=email
+                )
+                # 删除已使用的验证码
+                redis_conn.delete(f'email_{email}')
+
+            if user:
+                auth.login(request, user)
+                return JsonResponse({
+                    'code': 200,
+                    'errormsg': '注册成功',
+                    'data': {
+                        'user_id': user.id,
+                        'username': user.username,
+                        'email': user.email
+                    }
+                })
+            else:
+                return JsonResponse({'code': 5001, 'errormsg': '用户创建失败'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'code': 4000, 'errormsg': '请求参数格式错误'})
+        except Exception as e:
+            return JsonResponse({'code': 5000, 'errormsg': f'服务器内部错误: {str(e)}'})
+
+
+class ResetPasswordByEmail(View):
+    """通过邮箱找回密码"""
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            email_code = data.get('email_code')
+            new_password = data.get('new_password')
+
+            # 参数校验
+            if not all([email, email_code, new_password]):
+                return JsonResponse({'code': 4001, 'errormsg': '缺少必传参数'})
+
+            # 校验邮箱是否存在
+            try:
+                user = UserModel.objects.get(email=email)
+            except UserModel.DoesNotExist:
+                return JsonResponse({'code': 4002, 'errormsg': '该邮箱未注册'})
+
+            # 校验邮箱验证码
+            redis_conn = django_redis.get_redis_connection('verify_code')
+            code_real = redis_conn.get(f'email_reset_{email}')
+
+            if code_real is None:
+                return JsonResponse({'code': 4004, 'errormsg': '验证码已过期'})
+
+            if code_real.decode('utf-8') != email_code:
+                return JsonResponse({'code': 4005, 'errormsg': '验证码错误'})
+
+            # 重置密码
+            with transaction.atomic():
+                user.set_password(new_password)
+                user.save()
+                # 删除已使用的验证码
+                redis_conn.delete(f'email_reset_{email}')
+
+            return JsonResponse({'code': 200, 'errormsg': '密码重置成功'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'code': 4000, 'errormsg': '请求参数格式错误'})
+        except Exception as e:
+            return JsonResponse({'code': 5000, 'errormsg': f'服务器内部错误: {str(e)}'})
+
+
 #校验用户名
 class CheckUsername(View):
     def get(self,request,username):
@@ -184,9 +293,9 @@ class MakeFriend(View):
                 friend_obj_2.update(flag='0')
                 return JsonResponse({'code':200})
         if  is_friend:
-                data={'type_2':'friend_1','u_id':u_id,'p_id':o_id}
-                send_message.delay(data)
-                return JsonResponse({'code': 200})
+            data={'type_2':'friend_1','u_id':u_id,'p_id':o_id}
+            send_message.delay(data)
+            return JsonResponse({'code': 200})
             # FriendModel.objects.create(user_id=u_id,friend_user_id=o_id,flag='1')
             # return JsonResponse({'code':200})
         return JsonResponse({'code':400})
